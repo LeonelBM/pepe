@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 
 using Lab_9___ASP.NET.DataAbstractionLayer;
+using Lab_9___ASP.NET.Models;
 
 namespace Lab_9___ASP.NET.Controllers
 {
@@ -18,23 +19,35 @@ namespace Lab_9___ASP.NET.Controllers
 
         public bool Update()
         {
-            string title = Request.Params["title"];
-            string content = Request.Params["content"];
-            string producer = Request.Params["producer"];
-            string category = Request.Params["category"];
-
             DAL dal = new DAL();
+            string title = Request.Params["title"];
+            string author = Request.Params["author"];
+            int pages = int.Parse(Request.Params["pages"]);
+            string genre = Request.Params["genre"];
+            bool isLent = Request.Params["isLent"] == "on";
 
             string oldTitle = Request.Params["oldTitle"];
 
-            bool result = dal.Update(title, content, producer, category, oldTitle);
-
-            if (result)
+            // Extract the book ID from the URL query string
+            Guid id;
+            if (Guid.TryParse(Request.Params["id"], out id))
             {
-                Response.Redirect("~/NewsHome/Index");
+                Book book = new Book();
+                book.Id = id;
+                book.Title = title;
+                book.Author = author;
+                book.Pages = pages;
+                book.Genre = genre;
+                book.IsLent = isLent;
+                bool result = dal.UpdateBook(book);
+
+                if (result)
+                {
+                    Response.Redirect("~/BooksHome/Index");
+                }
             }
 
-            return result;
+            return false;
         }
     }
 }

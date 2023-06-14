@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30611.23
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab 9 - ASP.NET", "Lab 9 - ASP.NET\Lab 9 - ASP.NET.csproj", "{404DFA5E-C79E-4394-88D5-23D2C6528CB0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab 10 - ASP.NET", "Lab 9 - ASP.NET\Lab 10 - ASP.NET.csproj", "{404DFA5E-C79E-4394-88D5-23D2C6528CB0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

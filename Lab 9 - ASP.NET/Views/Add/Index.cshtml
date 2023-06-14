@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     Layout = null;
 }
 
@@ -8,7 +7,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Add News</title>
+    <title>Add Book</title>
 </head>
 <body>
     <script>
@@ -19,11 +18,12 @@
     <div>
         <form action="/Add/Add" method="GET">
             Title : <input type="text" id="IDtitle" name="title" /> <br />
-            Content : <input type="text" id="IDcontent" name="content" /> <br />
-            Producer : <input type="text" id="IDproducer" name="producer" /> <br />
-            Category : <input type="text" id="IDcategory" name="category" /> <br />
+            Author : <input type="text" id="IDauthor" name="author" /> <br />
+            Pages : <input type="number" id="IDpages" name="pages" /> <br />
+            Genre : <input type="text" id="IDgenre" name="genre" /> <br />
+            IsLent : <input type="checkbox" id="IDlent" name="isLent" /> <br />
             <input type="hidden" id="IDusername" name="username" /> <br />
-            <input type="submit" value="Add news" onclick="myFunction()" />
+            <input type="submit" value="Add book" onclick="myFunction()" />
         </form>
     </div>
 </body>

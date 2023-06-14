@@ -11,14 +11,11 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
 {
     public class DAL
     {
+        private string myConnectionString = "server=localhost;database=library;user=root;password=";
         public bool Login(string username, string password)
         {
             MySqlConnection conn;
-            string myConnectionString;
-
-            myConnectionString = "server=localhost;database=newsservice;uid=root;";
             List<User> userList = new List<User>();
-
             try
             {
                 conn = new MySqlConnection();
@@ -27,7 +24,7 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
 
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
-                cmd.CommandText = "SELECT * FROM user WHERE username = @Username AND password = @Password";
+                cmd.CommandText = "SELECT * FROM user WHERE Username = @Username AND Password = @Password";
 
                 cmd.Parameters.AddWithValue("@Username", username);
                 cmd.Parameters.AddWithValue("@Password", password);
@@ -55,10 +52,6 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
         public bool Register(string username, string password)
         {
             MySqlConnection conn;
-            string myConnectionString;
-
-            myConnectionString = "server=localhost;database=newsservice;uid=root;";
-
             try
             {
                 conn = new MySqlConnection();
@@ -67,7 +60,7 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
 
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
-                cmd.CommandText = "INSERT INTO user (username, password) VALUES (@Username, @Password)";
+                cmd.CommandText = "INSERT INTO user (Username, Password) VALUES (@Username, @Password)";
 
                 cmd.Parameters.AddWithValue("@Username", username);
                 cmd.Parameters.AddWithValue("@Password", password);
@@ -86,130 +79,44 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
             return false;
         }
 
-        public List<News> GetNews()
+        public List<string> GetGenres()
         {
-            MySqlConnection conn;
-            string myConnectionString;
-
-            myConnectionString = "server=localhost;database=newsservice;uid=root;";
-            List<News> newsList = new List<News>();
+            List<string> genreList = new List<string>();
 
             try
             {
-                conn = new MySqlConnection();
-                conn.ConnectionString = myConnectionString;
-                conn.Open();
-
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
-                cmd.CommandText = "SELECT * FROM news ORDER BY date DESC";
-
-                MySqlDataReader myreader = cmd.ExecuteReader();
-
-                while (myreader.Read())
+                using (MySqlConnection conn = new MySqlConnection())
                 {
-                    News news = new News();
-                    news.title = myreader.GetString("title");
-                    news.content = myreader.GetString("content");
-                    news.producer = myreader.GetString("producer");
-                    news.category = myreader.GetString("category");
-                    news.date = myreader.GetMySqlDateTime("date");
-                    news.user_id = myreader.GetInt16("user_id");
+                    conn.ConnectionString = myConnectionString;
+                    conn.Open();
 
-                    newsList.Add(news);
+                    using (MySqlCommand cmd = new MySqlCommand())
+                    {
+                        cmd.Connection = conn;
+                        cmd.CommandText = "SELECT DISTINCT Genre FROM books";
+
+                        using (MySqlDataReader myreader = cmd.ExecuteReader())
+                        {
+                            while (myreader.Read())
+                            {
+                                genreList.Add(myreader.GetString("Genre"));
+                            }
+                        }
+                    }
                 }
-
-                myreader.Close();
             }
             catch (MySqlException e)
             {
                 Console.Write(e.Message);
             }
 
-            return newsList;
+            return genreList;
         }
 
-        public bool Add(string title, string content, string producer, string category, int user_id)
-        {
-            MySqlConnection conn;
-            string myConnectionString;
-
-            myConnectionString = "server=localhost;database=newsservice;uid=root;";
-
-            try
-            {
-                conn = new MySqlConnection();
-                conn.ConnectionString = myConnectionString;
-                conn.Open();
-
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
-                cmd.CommandText = "INSERT INTO news(title, content, producer, category, date, user_id) VALUES (@Title, @Content, @Producer, @Category, @Date, @User_id)";
-
-                cmd.Parameters.AddWithValue("@Title", title);
-                cmd.Parameters.AddWithValue("@Content", content);
-                cmd.Parameters.AddWithValue("@Producer", producer);
-                cmd.Parameters.AddWithValue("@Category", category);
-                cmd.Parameters.AddWithValue("@Date", DateTime.Today);
-                cmd.Parameters.AddWithValue("@User_id", user_id);
-
-                int command = cmd.ExecuteNonQuery();
-
-                conn.Close();
-
-                return command == 1;
-            }
-            catch (MySqlException e)
-            {
-                Console.Write(e.Message);
-            }
-
-            return false;
-        }
-
-        public bool Update(string title, string content, string producer, string category, string oldTitle)
-        {
-            MySqlConnection conn;
-            string myConnectionString;
-
-            myConnectionString = "server=localhost;database=newsservice;uid=root;";
-
-            try
-            {
-                conn = new MySqlConnection();
-                conn.ConnectionString = myConnectionString;
-                conn.Open();
-
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
-                cmd.CommandText = "UPDATE news SET content = @Content, title=@Title, producer=@Producer, category=@Category WHERE title = @OldTitle";
-
-                cmd.Parameters.AddWithValue("@Title", title);
-                cmd.Parameters.AddWithValue("@Content", content);
-                cmd.Parameters.AddWithValue("@Producer", producer);
-                cmd.Parameters.AddWithValue("@Category", category);
-                cmd.Parameters.AddWithValue("@OldTitle", oldTitle);
-
-                int command = cmd.ExecuteNonQuery();
-
-                conn.Close();
-
-                return command == 1;
-            }
-            catch (MySqlException e)
-            {
-                Console.Write(e.Message);
-            }
-
-            return false;
-        }
 
         public int GetUserIdByName(string username)
         {
             MySqlConnection conn;
-            string myConnectionString;
-
-            myConnectionString = "server=localhost;database=newsservice;uid=root;";
             int id = 0;
 
             try
@@ -220,7 +127,7 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
 
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
-                cmd.CommandText = "SELECT * FROM user WHERE username='" + username + "'";
+                cmd.CommandText = "SELECT * FROM user WHERE Username='" + username + "'";
 
                 MySqlDataReader myreader = cmd.ExecuteReader();
 
@@ -239,13 +146,11 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
             return id;
         }
 
-        public List<string> GetCategories()
+
+        public List<Book> GetAllBooks()
         {
             MySqlConnection conn;
-            string myConnectionString;
-
-            myConnectionString = "server=localhost;database=newsservice;uid=root;";
-            List<string> categoriesList = new List<string>();
+            List<Book> bookList = new List<Book>();
 
             try
             {
@@ -255,13 +160,21 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
 
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
-                cmd.CommandText = "SELECT DISTINCT category FROM news";
+                cmd.CommandText = "SELECT * FROM books";
 
                 MySqlDataReader myreader = cmd.ExecuteReader();
 
                 while (myreader.Read())
                 {
-                    categoriesList.Add(myreader.GetString("category"));
+                    Book book = new Book();
+                    book.Id = myreader.GetGuid("Id");
+                    book.Title = myreader.GetString("Title");
+                    book.Author = myreader.GetString("Author");
+                    book.Pages = myreader.GetInt32("Pages");
+                    book.Genre = myreader.GetString("Genre");
+                    book.IsLent = myreader.GetBoolean("IsLent");
+
+                    bookList.Add(book);
                 }
 
                 myreader.Close();
@@ -271,16 +184,13 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
                 Console.Write(e.Message);
             }
 
-            return categoriesList;
+            return bookList;
         }
 
-        public List<MySqlDateTime> GetDates()
+        public List<Book> GetBooksByGenre(string genre)
         {
             MySqlConnection conn;
-            string myConnectionString;
-
-            myConnectionString = "server=localhost;database=newsservice;uid=root;";
-            List<MySqlDateTime> datesList = new List<MySqlDateTime>();
+            List<Book> bookList = new List<Book>();
 
             try
             {
@@ -290,13 +200,23 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
 
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
-                cmd.CommandText = "SELECT DISTINCT date FROM news";
+                cmd.CommandText = "SELECT * FROM books WHERE Genre = @Genre";
+
+                cmd.Parameters.AddWithValue("@Genre", genre);
 
                 MySqlDataReader myreader = cmd.ExecuteReader();
 
                 while (myreader.Read())
                 {
-                    datesList.Add(myreader.GetMySqlDateTime("date"));
+                    Book book = new Book();
+                    book.Id = myreader.GetGuid("Id");
+                    book.Title = myreader.GetString("Title");
+                    book.Author = myreader.GetString("Author");
+                    book.Pages = myreader.GetInt32("Pages");
+                    book.Genre = myreader.GetString("Genre");
+                    book.IsLent = myreader.GetBoolean("IsLent");
+
+                    bookList.Add(book);
                 }
 
                 myreader.Close();
@@ -306,16 +226,12 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
                 Console.Write(e.Message);
             }
 
-            return datesList;
+            return bookList;
         }
 
-        public List<News> GetNewsByCategory(string category)
+        public bool AddBook(Book book)
         {
             MySqlConnection conn;
-            string myConnectionString;
-
-            myConnectionString = "server=localhost;database=newsservice;uid=root;";
-            List<News> newsList = new List<News>();
 
             try
             {
@@ -325,23 +241,50 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
 
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
-                cmd.CommandText = "SELECT * FROM news WHERE category = @Category ORDER BY date DESC";
+                cmd.CommandText = "INSERT INTO books(Id, Title, Author, Pages, Genre, IsLent) VALUES (@Id, @Title, @Author, @Pages, @Genre, @IsLent)";
 
-                cmd.Parameters.AddWithValue("@Category", category);
+                cmd.Parameters.AddWithValue("@Id", book.Id);
+                cmd.Parameters.AddWithValue("@Title", book.Title);
+                cmd.Parameters.AddWithValue("@Author", book.Author);
+                cmd.Parameters.AddWithValue("@Pages", book.Pages);
+                cmd.Parameters.AddWithValue("@Genre", book.Genre);
+                cmd.Parameters.AddWithValue("@IsLent", book.IsLent);
+
+                int command = cmd.ExecuteNonQuery();
+
+                conn.Close();
+
+                return command == 1;
+            }
+            catch (MySqlException e)
+            {
+                Console.Write(e.Message);
+            }
+
+            return false;
+        }
+        public Guid GetBookIdByName(string title)
+        {
+            MySqlConnection conn;
+            Guid bookId = Guid.Empty;
+
+            try
+            {
+                conn = new MySqlConnection();
+                conn.ConnectionString = myConnectionString;
+                conn.Open();
+
+                MySqlCommand cmd = new MySqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandText = "SELECT Id FROM books WHERE Title = @Title";
+
+                cmd.Parameters.AddWithValue("@Title", title);
 
                 MySqlDataReader myreader = cmd.ExecuteReader();
 
-                while (myreader.Read())
+                if (myreader.Read())
                 {
-                    News news = new News();
-                    news.title = myreader.GetString("title");
-                    news.content = myreader.GetString("content");
-                    news.producer = myreader.GetString("producer");
-                    news.category = myreader.GetString("category");
-                    news.date = myreader.GetMySqlDateTime("date");
-                    news.user_id = myreader.GetInt16("user_id");
-
-                    newsList.Add(news);
+                    bookId = myreader.GetGuid("Id");
                 }
 
                 myreader.Close();
@@ -351,16 +294,13 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
                 Console.Write(e.Message);
             }
 
-            return newsList;
+            return bookId;
         }
 
-        public List<News> GetNewsByDate(DateTime date)
+        public bool DeleteBook(Guid id)
         {
             MySqlConnection conn;
-            string myConnectionString;
-
-            myConnectionString = "server=localhost;database=newsservice;uid=root;";
-            List<News> newsList = new List<News>();
+            bool result = false;
 
             try
             {
@@ -370,33 +310,53 @@ namespace Lab_9___ASP.NET.DataAbstractionLayer
 
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
-                cmd.CommandText = "SELECT * FROM news WHERE date = @Date ORDER BY date DESC";
+                cmd.CommandText = "DELETE FROM books WHERE Id = @Id";
 
-                cmd.Parameters.AddWithValue("@Date", date);
+                cmd.Parameters.AddWithValue("@Id", id);
 
-                MySqlDataReader myreader = cmd.ExecuteReader();
+                int rowsAffected = cmd.ExecuteNonQuery();
 
-                while (myreader.Read())
-                {
-                    News news = new News();
-                    news.title = myreader.GetString("title");
-                    news.content = myreader.GetString("content");
-                    news.producer = myreader.GetString("producer");
-                    news.category = myreader.GetString("category");
-                    news.date = myreader.GetMySqlDateTime("date");
-                    news.user_id = myreader.GetInt16("user_id");
-
-                    newsList.Add(news);
-                }
-
-                myreader.Close();
+                result = rowsAffected > 0;
             }
             catch (MySqlException e)
             {
                 Console.Write(e.Message);
             }
 
-            return newsList;
+            return result;
+        }
+
+
+        public bool UpdateBook(Book book)
+            {
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(myConnectionString))
+                    {
+                        conn.Open();
+
+                        string query = "UPDATE books SET Title = @Title, Author = @Author, Pages = @Pages, Genre = @Genre, IsLent = @IsLent WHERE Id = @Id";
+
+                        using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", book.Id);
+                            cmd.Parameters.AddWithValue("@Title", book.Title);
+                            cmd.Parameters.AddWithValue("@Author", book.Author);
+                            cmd.Parameters.AddWithValue("@Pages", book.Pages);
+                            cmd.Parameters.AddWithValue("@Genre", book.Genre);
+                            cmd.Parameters.AddWithValue("@IsLent", book.IsLent);
+
+                            int result = cmd.ExecuteNonQuery();
+
+                            return result == 1;
+                        }
+                    }
+                }
+                catch (MySqlException e)
+                {
+                    Console.Write(e.Message);
+                    return false;
+                }
+            }
         }
     }
-}
